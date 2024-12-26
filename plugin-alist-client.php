@@ -5,7 +5,7 @@ if (!defined('ABSPATH')) exit;
  * Plugin Name: AIYA-CMS 文件提取（Alist API）
  * Plugin URI: https://www.yeraph.com/
  * Description: 基于 Alist API 提取 Alist 服务器中的文件
- * Version: 1.0.0
+ * Version: 1.0.1
  * Author: Yeraph Studio
  * Author URI: https://www.yeraph.com/
  * License: GPLv3 or later
@@ -25,6 +25,6 @@ require_once AYA_ALIST_PLUGIN_PATH . 'lib/Alist_UpFile.php';
 require_once AYA_ALIST_PLUGIN_PATH . 'plugin-build-framework-options.php';
 //插件文件
 require_once AYA_ALIST_PLUGIN_PATH . 'inc/method-public.php';
-require_once AYA_ALIST_PLUGIN_PATH . 'inc/method-upload.php';
-//require_once AYA_ALIST_PLUGIN_PATH . 'inc/method-rest-api.php';
 require_once AYA_ALIST_PLUGIN_PATH . 'inc/method-short-code.php';
+//require_once AYA_ALIST_PLUGIN_PATH . 'inc/method-upload.php';
+//require_once AYA_ALIST_PLUGIN_PATH . 'inc/method-rest-api.php';

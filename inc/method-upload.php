@@ -1,7 +1,7 @@
 <?php
 if (!defined('ABSPATH')) exit;
 
-add_action('after_setup_theme', 'aya_alist_server_add_metabox');
+//add_action('after_setup_theme', 'aya_alist_server_add_metabox');
 
 //注册MetaBox
 function aya_alist_server_add_metabox()

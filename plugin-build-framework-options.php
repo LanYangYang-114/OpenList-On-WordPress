@@ -137,6 +137,7 @@ function aya_alist_server_option()
                 ),
                 'default' => array('page', 'down'),
             ),
+            /*
             array(
                 'desc' => 'Alist 自动功能',
                 'type' => 'title_2',
@@ -169,6 +170,7 @@ function aya_alist_server_option()
                 ),
                 'default' => 'false',
             ),
+            */
             array(
                 'desc' => 'Alist 自定义CSS',
                 'type' => 'title_2',
