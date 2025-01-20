@@ -14,9 +14,9 @@ if (!defined('AYA_RELEASE')) {
         wp_register_style('bootstrap', $url_cdn . '/bootstrap/5.3.3/css/bootstrap.min.css', array(), '5.3.3', 'all');
         wp_register_style('bootstrap-icons', $url_cdn . '/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css', array(), '1.11.3', 'all');
 
-        wp_enqueue_script('bootstrap');
-        wp_enqueue_style('bootstrap');
-        wp_enqueue_style('bootstrap-icons');
+        //wp_enqueue_script('bootstrap');
+        //wp_enqueue_style('bootstrap');
+        //wp_enqueue_style('bootstrap-icons');
     }
 }
 //引入设置框架

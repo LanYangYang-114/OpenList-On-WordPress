@@ -48,7 +48,7 @@ class Alist_API
             $data = json_decode($response->data, true);
 
             if ($data['code'] == 200) {
-                return $data['data'];
+                return $data['data']['token'];
             } else {
                 return 'ERROR:' . $data['message'];
             }
@@ -77,7 +77,7 @@ class Alist_API
             $data = json_decode($response->data, true);
 
             if ($data['code'] == 200) {
-                return $data['data'];
+                return $data['data']['token'];
             } else {
                 return 'ERROR:' . $data['message'];
             }

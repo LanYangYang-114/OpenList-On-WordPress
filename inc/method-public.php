@@ -23,6 +23,7 @@ function aya_alist_request_token($server, $username, $password)
 
         $token = $alist->get_temp_token($username, $password);
 
+        
         //检查返回
         if (strpos($token, 'ERROR:') === false) {
             //设置缓存
