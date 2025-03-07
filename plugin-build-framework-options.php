@@ -1,27 +1,22 @@
 <?php
 if (!defined('ABSPATH')) exit;
 
-//检查是否从AIYA-CMS主题加载
-if (!defined('AYA_RELEASE')) {
-    add_action('wp_enqueue_scripts', 'aya_alist_plugin_enqueue_scripts');
-    //注册静态文件
-    function aya_alist_plugin_enqueue_scripts()
-    {
-        $url_cdn = '//cdnjs.cloudflare.com/ajax/libs';
-        //$url_cdn = '//s4.zstatic.net/ajax/libs';
+add_action('after_setup_theme', 'aya_alist_server_option');
+//add_action('wp_enqueue_scripts', 'aya_alist_plugin_enqueue_scripts');
 
-        wp_register_script('bootstrap', $url_cdn . '/bootstrap/5.3.3/js/bootstrap.min.js', array(), '5.3.3', true);
-        wp_register_style('bootstrap', $url_cdn . '/bootstrap/5.3.3/css/bootstrap.min.css', array(), '5.3.3', 'all');
-        wp_register_style('bootstrap-icons', $url_cdn . '/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css', array(), '1.11.3', 'all');
+//注册静态文件
+function aya_alist_plugin_enqueue_scripts()
+{
+    $url_cdn = '//cdnjs.cloudflare.com/ajax/libs';
+    //$url_cdn = '//s4.zstatic.net/ajax/libs';
 
-        //wp_enqueue_script('bootstrap');
-        //wp_enqueue_style('bootstrap');
-        //wp_enqueue_style('bootstrap-icons');
-    }
-}
-//引入设置框架
-if (!class_exists('AYF')) {
-    require_once AYA_ALIST_PLUGIN_PATH . '/framework-required/setup.php';
+    wp_register_script('bootstrap', $url_cdn . '/bootstrap/5.3.3/js/bootstrap.min.js', array(), '5.3.3', true);
+    wp_register_style('bootstrap', $url_cdn . '/bootstrap/5.3.3/css/bootstrap.min.css', array(), '5.3.3', 'all');
+    wp_register_style('bootstrap-icons', $url_cdn . '/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css', array(), '1.11.3', 'all');
+
+    wp_enqueue_script('bootstrap');
+    wp_enqueue_style('bootstrap');
+    wp_enqueue_style('bootstrap-icons');
 }
 
 //添加设置选项
@@ -208,5 +203,3 @@ function aya_alist_server_option()
         ),
     ));
 }
-
-add_action('after_setup_theme', 'aya_alist_server_option');
