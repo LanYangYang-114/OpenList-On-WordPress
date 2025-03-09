@@ -17,15 +17,6 @@ if (!defined('ABSPATH')) exit;
 define('AYA_ALIST_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('AYA_ALIST_PLUGIN_PATH', plugin_dir_path(__FILE__));
 
-//检查设置框架
-if (!class_exists('AYF')) {
-    //不是Release
-    if (file_exists(AYA_ALIST_PLUGIN_PATH . '/framework-required/setup.php')) {
-        require_once AYA_ALIST_PLUGIN_PATH . '/framework-required/setup.php';
-    } else {
-        return;
-    }
-}
 //引入Alist客户端组件
 require_once AYA_ALIST_PLUGIN_PATH . 'lib/Http_Request.php';
 require_once AYA_ALIST_PLUGIN_PATH . 'lib/Alist.php';

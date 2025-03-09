@@ -22,6 +22,15 @@ function aya_alist_plugin_enqueue_scripts()
 //添加设置选项
 function aya_alist_server_option()
 {
+    //检查设置框架
+    if (!class_exists('AYF')) {
+        //不是Release
+        if (file_exists(AYA_ALIST_PLUGIN_PATH . '/framework-required/setup.php')) {
+            require_once AYA_ALIST_PLUGIN_PATH . '/framework-required/setup.php';
+        } else {
+            return;
+        }
+    }
     //设置表单
     AYF::new_opt(array(
         'title' => 'AIYA-AlistClient',
