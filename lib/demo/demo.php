@@ -4,9 +4,8 @@ define('ALIST_SERVER', 'http://127.0.0.1:5244'); // Alist 服务器地址
 define('ALIST_USERNAME', 'guest'); // Alist 用户名
 define('ALIST_PASSWORD', '123456'); // Alist 密码
 
-require_once (__DIR__) . 'lib/Http_Request.php';
-require_once (__DIR__) . 'lib/Alist.php';
-require_once (__DIR__) . 'lib/Alist_UpFile.php';
+require_once (__DIR__) . '../Http_Request.php';
+require_once (__DIR__) . '../Alist_API.php';
 
 //使用文件缓存Token
 function aya_alist_token_cache()

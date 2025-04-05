@@ -1,7 +1,8 @@
 <?php
 
-if (!defined('ABSPATH'))
+if (!defined('ABSPATH')) {
     exit;
+}
 
 /**
  * Alist API 类
@@ -29,7 +30,7 @@ class Alist_API
         $this->http = new HTTP_Request();
     }
     //获取临时token（48小时过期）
-    public function get_temp_token($username, $password, $otp_code = null)
+    public function get_token($username, $password, $otp_code = null)
     {
         //接口位置
         $api_url = $this->server . '/api/auth/login';
@@ -59,7 +60,7 @@ class Alist_API
         return false;
     }
     //获取token（hash）
-    public function get_token($username, $password, $otp_code = null)
+    public function get_token_hash($username, $password, $otp_code = null)
     {
         //接口位置
         $api_url = $this->server . '/api/auth/login/hash';
