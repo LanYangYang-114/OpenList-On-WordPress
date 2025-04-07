@@ -29,7 +29,26 @@ class Alist_API
         $this->token = $token;
         $this->http = new HTTP_Request();
     }
-    //获取临时token（48小时过期）
+    //Ping检测
+    public function ping()
+    {
+        //接口位置
+        $api_url = $this->server . '/ping';
+        //请求头
+        $this->http->set_header(['User-Agent: AIYA-CMS-CLI/1.0']);
+
+        //发送请求
+        $response = $this->http->get($api_url, []);
+
+        //返回
+        if ($response->status == 200 && $response->data == "pong") {
+
+            return true;
+        }
+
+        return false;
+    }
+    //获取token
     public function get_token($username, $password, $otp_code = null)
     {
         //接口位置
@@ -45,6 +64,7 @@ class Alist_API
 
         //发送请求
         $response = $this->http->post($api_url, $query_data);
+
         //返回
         if ($response->status == 200) {
 
@@ -75,6 +95,7 @@ class Alist_API
 
         //发送请求
         $response = $this->http->post($api_url, $query_data);
+
         //返回
         if ($response->status == 200) {
 
@@ -83,14 +104,14 @@ class Alist_API
             if ($data['code'] == 200) {
                 return $data['data']['token'];
             } else {
-                return 'ERROR:' . $data['message'];
+                return 'ERROR:' . $data['code'] . '-' . $data['message'];
             }
         }
 
         return false;
     }
     //获取当前用户信息
-    public function get_info_me()
+    public function get_me()
     {
         //接口位置
         $api_url = $this->server . '/api/me';
@@ -99,6 +120,7 @@ class Alist_API
 
         //发送请求
         $response = $this->http->get($api_url, []);
+
         //返回
         if ($response->status == 200) {
 
@@ -107,7 +129,7 @@ class Alist_API
             if ($data['code'] == 200) {
                 return $data['data'];
             } else {
-                return 'ERROR:' . $data['message'];
+                return 'ERROR:' . $data['code'] . '-' . $data['message'];
             }
         }
 
@@ -123,6 +145,7 @@ class Alist_API
 
         //发送请求
         $response = $this->http->get($api_url, []);
+
         //返回
         if ($response->status == 200) {
 
@@ -131,27 +154,8 @@ class Alist_API
             if ($data['code'] == 200) {
                 return $data['data'];
             } else {
-                return 'ERROR:' . $data['message'];
+                return 'ERROR:' . $data['code'] . '-' . $data['message'];
             }
-        }
-
-        return false;
-    }
-    //Ping检测
-    public function ping()
-    {
-        //接口位置
-        $api_url = $this->server . '/ping';
-        //请求头
-        $this->http->set_header(['User-Agent: AIYA-CMS-CLI/1.0']);
-
-        //发送请求
-        $response = $this->http->get($api_url, []);
-
-        //返回
-        if ($response->status == 200 && $response->data == "pong") {
-
-            return true;
         }
 
         return false;
