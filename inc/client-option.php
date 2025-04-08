@@ -3,13 +3,6 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-add_shortcode('alist_dev', 'aya_alist_shortcode_methods');
-
-function aya_alist_shortcode_methods($atts = array(), $content = null)
-{
-    print_r(aya_alist_permission_check());
-    return;
-}
 /*
  * ------------------------------------------------------------------------------
  * 设置页面
@@ -39,15 +32,15 @@ function aya_alist_server_option_page()
                 ],
                 [
                     'type' => 'content',
-                    'desc' => '文件/文件夹列表：[code][alist_cli method="list" path="/" password="" page="1" per_page="0" refresh="false" ]列表描述[/alist_cli][/code]',
+                    'desc' => '文件/文件夹详情：[code][alist_cli method="get" path="/readme.md" password="" refresh="false"][/alist_cli][/code]',
                 ],
                 [
                     'type' => 'content',
-                    'desc' => '文件/文件夹详情：[code][alist_cli method="get" path="/readme.md" password="" page="1" per_page="0" refresh="false" ][/alist_cli][/code]',
+                    'desc' => '文件/文件夹列表：[code][alist_cli method="list" path="/" password="" refresh="false"][/alist_cli][/code]',
                 ],
                 [
                     'type' => 'content',
-                    'desc' => '搜索结果：[code][alist_cli method="search" parent="/" keyword="关键词" scope="2" page="1" per_page="0" password="" ][/alist_cli][/code]',
+                    'desc' => '搜索结果：[code][alist_cli method="search" parent="/" keyword="关键词" scope="2" password=""][/alist_cli][/code]',
                 ],
                 [
                     'type' => 'content',
@@ -101,7 +94,7 @@ function aya_alist_server_option_page()
                 [
                     'title' => '异步加载',
                     'desc' => '使用 AJAX 加载文件列表，而不是在页面中加载',
-                    'id' => 'alist_client_ajax_mode',
+                    'id' => 'alist_client_ajax_load',
                     'type' => 'switch',
                     'default' => true,
                 ],
@@ -110,29 +103,77 @@ function aya_alist_server_option_page()
                     'desc' => '为文件获取图标，使用 bootstrap-icons 图标库',
                     'id' => 'alist_client_view_icon',
                     'type' => 'radio',
-                    'sub' => array(
+                    'sub' => [
                         'off' => '禁用',
                         'ext' => '匹配文件后缀',
                         'typ' => '匹配文件类型',
-                    ),
+                    ],
                     'default' => 'typ',
                 ],
                 [
                     'title' => '下载链接设置',
                     'desc' => '配置在文件列表中显示 Alist 的文件链接[br/]文件页面：直接返回文件详情页面（不会附带文件签名）[br/]下载地址：拼接文件的下载地址（请求[code]/d/[/code]路径）[br/]下载地址（代理）：拼接文件的下载地址（请求[code]/p/[/code]路径）',
                     'id' => 'alist_client_view_link_type',
-                    'type' => 'radio',
-                    'sub' => array(
+                    'type' => 'checkbox',
+                    'sub' => [
                         'page' => '文件页面',
                         'down' => '下载地址',
                         'proxy' => '下载地址（通过代理）',
                         'raw' => '直接取出直链',
-                    ),
+                    ],
                     'default' => 'page',
                 ],
             ],
         ]
     );
+    
+    if (is_admin()) {
+        //初始化简码输入框组件按钮
+        AYA_Shortcode::instance();
+
+        AYA_Shortcode::shortcode_register('hidden-content', array(
+            'id' => 'sc-alist-client',
+            'title' => 'Alist 客户端',
+            'note' => 'Alist 客户端的请求体调用',
+            'template' => '[alist_cli {{attributes}}] {{content}} [/alist_cli]',
+            'field_build' => array(
+                [
+                    'id' => 'method',
+                    'type'  => 'select',
+                    'label' => '请求方法',
+                    'desc'  => '选择请求方法',
+                    'sub' => [
+                        'list' => '列表',
+                        'get' => '详情',
+                        'search' => '搜索',
+                    ],
+                    'default' => 'list',
+                ],
+                [
+                    'id' => 'path',
+                    'type' => 'text',
+                    'label' => '路径',
+                    'desc' => '请求的路径',
+                    'default' => '/',
+                ],
+                [
+                    'id' => 'refresh',
+                    'type'  => 'checkbox',
+                    'label' => '强制刷新',
+                    'desc' => '是否强制刷新',
+                    'default' => false,
+                ],
+                [
+                    'id' => 'content',
+                    'type' => 'textarea',
+                    'label' => '描述',
+                    'desc' => '在这里输入描述文本',
+                    'default' => '',
+                ]
+            )
+        ));
+        AYA_Shortcode::instance();
+    }
 }
 
 //服务器测试流程

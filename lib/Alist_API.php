@@ -278,8 +278,7 @@ class Alist_API
             return $response;
         }
 
-        //return $response;
-        return $response['content'];
+        return $response;
     }
     //获取某个文件/目录信息
     public function fs_get($path, $password = '', $page = 1, $per_page = 0, $refresh = false)
@@ -341,8 +340,7 @@ class Alist_API
             return $response;
         }
 
-        //return $response;
-        return $response['content'];
+        return $response;
     }
     //新建文件夹
     public function fs_mkdir($path)

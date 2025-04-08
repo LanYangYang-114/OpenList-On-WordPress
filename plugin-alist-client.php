@@ -30,6 +30,7 @@ require_once AYA_ALIST_PLUGIN_PATH . 'lib/Alist_API.php';
 require_once AYA_ALIST_PLUGIN_PATH . 'inc/client-option.php';
 //插件文件
 require_once AYA_ALIST_PLUGIN_PATH . 'inc/client-public.php';
+require_once AYA_ALIST_PLUGIN_PATH . 'inc/client-shortcode.php';
 //require_once AYA_ALIST_PLUGIN_PATH . 'inc/method-public.php';
 //require_once AYA_ALIST_PLUGIN_PATH . 'inc/method-short-code.php';
 //require_once AYA_ALIST_PLUGIN_PATH . 'inc/method-upload.php';

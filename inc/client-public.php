@@ -15,14 +15,16 @@ function aya_alist_opt($opt_name)
     return AYF::get_opt('alist_client_' . $opt_name, 'alist');
 }
 
-//Ping测试
-function aya_alist_ping_server()
+//JSON编码
+function aya_alist_json_encode($data)
 {
-    $server = aya_alist_opt('api_url');
+    $json = json_encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
-    $alist = new Alist_API($server, false);
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        return false;
+    }
 
-    return $alist->ping();
+    return $json;
 }
 
 //获取服务器地址
@@ -33,13 +35,25 @@ function aya_alist_server_url()
     return trim($server_url, '/');
 }
 
+//Ping测试
+function aya_alist_ping_server()
+{
+    $server = aya_alist_server_url();
+
+    $alist = new Alist_API($server, false);
+
+    return $alist->ping();
+}
+
 //获取Token
 function aya_alist_request_token()
 {
+    $server = aya_alist_server_url();
+
     $user = aya_alist_opt('api_user');
     $pswd = aya_alist_opt('api_pswd');
 
-    $alist = new Alist_API(aya_alist_server_url(), false);
+    $alist = new Alist_API($server, false);
 
     return $alist->get_token($user, $pswd);
 }
@@ -94,12 +108,21 @@ function aya_alist_refresh_token()
     }
 }
 
+//返回 Alist 接口对象
+function aya_alist_cli()
+{
+    $server = aya_alist_server_url();
+    $token = aya_alist_transient_token();
+
+    $alist_cli = new Alist_API($server, $token);
+
+    return $alist_cli;
+}
+
 //验证Token权限
 function aya_alist_permission_check()
 {
-    $alist = new Alist_API(aya_alist_server_url(), aya_alist_transient_token());
-
-    $get_permission = $alist->get_me();
+    $get_permission = aya_alist_cli()->get_me();
 
     //令牌失效
     if (!is_array($get_permission) && strpos($get_permission, 'ERROR:') !== false) {
@@ -114,34 +137,4 @@ function aya_alist_permission_check()
     }
 
     return true;
-}
-
-/*
- * ------------------------------------------------------------------------------
- * 数据处理
- * ------------------------------------------------------------------------------
- */
-
-//计算文件大小
-function aya_alist_file_size_format($bytes, $precision = 2)
-{
-    $units = array('B', 'KB', 'MB', 'GB', 'TB');
-    $bytes = max($bytes, 0);
-    //幂等计算
-    $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
-    $pow = min($pow, count($units) - 1);
-
-    $bytes /= pow(1024, $pow);
-    // $bytes /= (1 << (10 *$pow)); 
-
-    return round($bytes, $precision) . ' ' . $units[$pow];
-}
-
-//计算文件创建日期
-function aya_alist_file_date_format($date)
-{
-    //DateTime方法
-    $this_date = new DateTime($date);
-
-    return $this_date->format('Y-m-d');
 }

@@ -132,42 +132,7 @@ function aya_shortcode_alist_cli_fs_list_methods($atts = array(), $content = nul
 
     return $html;
 }
-//请求文件
-function aya_shortcode_alist_cli_get_raw_url($atts = array(), $content = null)
-{
-    $atts = shortcode_atts(
-        array(
-            'path' => '/',
-        ),
-        $atts
-    );
 
-    $path = trim($atts['path']);
-
-    $server = aya_alist_get_server();
-    $token = aya_alist_get_token();
-
-    if (!$server || !$token) {
-        return __('连接失败', 'AIYA-ALIST');
-    }
-
-    //创建API对象
-    $alist_cli = new Alist_API($server, $token);
-
-    //获取文件
-    $fs = $alist_cli->fs_get($path);
-
-    //检查报错
-    if (!is_array($fs)) {
-        return $fs;
-    }
-    //检查是否为文件夹
-    else if (boolval($fs['is_dir'])) {
-        return __('目标路径为文件夹，项目不可用', 'AIYA-ALIST');
-    }
-
-    return $fs['raw_url'];
-}
 //异步获取文件列表
 function aya_alist_server_ajax_list_callback()
 {
