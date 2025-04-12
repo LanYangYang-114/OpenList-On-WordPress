@@ -12,8 +12,8 @@ if (!defined('ABSPATH')) {
  * Author URI: https://www.yeraph.com/
  * License: GPLv3 or later
  * Requires at least: 6.1
- * Tested up to: 6.5
- * Requires PHP: 7.4
+ * Tested up to: 6.7
+ * Requires PHP: 8.2
  */
 
 define('AYA_ALIST_PLUGIN_URL', plugin_dir_url(__FILE__));
@@ -30,8 +30,5 @@ require_once AYA_ALIST_PLUGIN_PATH . 'lib/Alist_API.php';
 require_once AYA_ALIST_PLUGIN_PATH . 'inc/client-option.php';
 //插件文件
 require_once AYA_ALIST_PLUGIN_PATH . 'inc/client-public.php';
+require_once AYA_ALIST_PLUGIN_PATH . 'inc/client-templates.php';
 require_once AYA_ALIST_PLUGIN_PATH . 'inc/client-shortcode.php';
-//require_once AYA_ALIST_PLUGIN_PATH . 'inc/method-public.php';
-//require_once AYA_ALIST_PLUGIN_PATH . 'inc/method-short-code.php';
-//require_once AYA_ALIST_PLUGIN_PATH . 'inc/method-upload.php';
-//require_once AYA_ALIST_PLUGIN_PATH . 'inc/method-rest-api.php';
