@@ -84,11 +84,7 @@ function aya_alist_cli_shortcode_fs_methods($atts = array(), $content = null)
     $page = ($per_page_num == 0) ? 1 : $get_page;
 
     //开始配置请求参数
-    $fs_query = array();
-
-    $fs_query['page'] = $page;
-    $fs_query['per_page'] = $per_page_num;
-    $fs_query['password'] = $pswd;
+    $fs_query = [];
 
     if ($method == 'get') {
         //加载为文件详情
@@ -116,17 +112,24 @@ function aya_alist_cli_shortcode_fs_methods($atts = array(), $content = null)
             $parent = $path;
         }
 
+        $per_page_num = 20;
+        $page = 1;
+
         $fs_query['parent'] = $parent;
         $fs_query['keyword'] = $keyword;
         $fs_query['scope'] = $scope;
     } else {
         $method = 'null';
-        $content = __('未定义的请求方法', 'AIYA-ALIST');
     }
 
+    $fs_query['page'] = $page;
+    $fs_query['per_page'] = $per_page_num;
+    $fs_query['password'] = $pswd;
     $fs_query['query_method_is'] = $method;
 
     $html = '';
+
+    $html .= '<div class="container alist-container">';
 
     //异步模式
     if ($ajax_load) {
@@ -139,6 +142,8 @@ function aya_alist_cli_shortcode_fs_methods($atts = array(), $content = null)
     if ($content != '') {
         $html .= do_shortcode($content);
     }
+
+    $html .= '</div>';
 
     return $html;
 }

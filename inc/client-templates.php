@@ -9,19 +9,6 @@ if (!defined('ABSPATH')) {
  * ------------------------------------------------------------------------------
  */
 
-//前端传参时打包为JSON
-function aya_alist_format_ajax_atts_encode($fs_data_atts = array())
-{
-    //转为JSON传递
-    $data_json = aya_alist_json_encode($fs_data_atts);
-    //编码为base64
-    $data_base64 = base64_encode($data_json);
-
-    $data_base64_urlsafe = str_replace(['+', '/', '='], ['-', '_', ''], $data_base64);
-
-    return $data_base64_urlsafe;
-}
-
 //计算文件大小
 function aya_alist_format_file_size($fs_data, $precision = 2)
 {
@@ -32,7 +19,7 @@ function aya_alist_format_file_size($fs_data, $precision = 2)
     $pow = min($pow, count($units) - 1);
 
     $bytes /= pow(1024, $pow);
-    // $bytes /= (1 << (10 *$pow)); 
+    //$bytes /= (1 << (10 *$pow));
 
     return round($bytes, $precision) . ' ' . $units[$pow];
 }
@@ -215,15 +202,16 @@ function aya_alist_format_file_link($fs_data, $fs_query)
 {
     //链接设置
     $view_link = aya_alist_opt('view_link_type');
-
+    $method = $fs_query['query_method_is'];
     $data_is_dir = boolval($fs_data['is_dir']);
 
     //从数据中拼接完整的文件路径
-    if ($fs_query['query_method_is'] == 'get') {
+    if ($method == 'get') {
         $full_path = $fs_query['path'];
     } else {
-        $full_path = '/' . ltrim($fs_query['path'], '/') . $fs_data['name'];
+        $full_path = '/' . ltrim($fs_query['parent'], '/') . urlencode($fs_data['name']);
     }
+
     //匹配按钮名称
     if ($data_is_dir) {
         $btn_name = aya_alist_format_get_icon('folder') . __('打开', 'AIYA-ALIST');
@@ -235,6 +223,7 @@ function aya_alist_format_file_link($fs_data, $fs_query)
         $btn_name = aya_alist_format_get_icon('download') . __('下载', 'AIYA-ALIST');
         $down_path = '/d';
     }
+
     //直链模式
     if ($view_link == 'raw_url') {
         //如果是文件夹
@@ -242,7 +231,7 @@ function aya_alist_format_file_link($fs_data, $fs_query)
             return '<a class="btn down-btn down-btn-disabled">' . __('不可用', 'AIYA-ALIST') . '</a>';
         }
         //如果是get模式
-        if ($fs_query['query_method_is'] == 'get') {
+        if ($method == 'get') {
             $btn_href = $fs_data['raw_url'];
         } else {
             //请求直链
@@ -255,7 +244,7 @@ function aya_alist_format_file_link($fs_data, $fs_query)
         }
     } else {
         $server_url = aya_alist_server_url();
-        $file_sign = ($fs_data['sign'] == '') ? '' : '?sign=' . $fs_data['sign'];
+        $file_sign = ($fs_data['sign'] != '') ? '' : '?sign=' . $fs_data['sign'];
 
         $btn_href = $server_url . $down_path . $full_path . $file_sign;
     }
@@ -299,18 +288,23 @@ function aya_alist_template_ajax_post($fs_data_atts = array())
     $unique_id = 'alist-' . uniqid();
     //请求参数
     $ajax_url = admin_url('admin-ajax.php');
+
+    //转为JSON传递
+    $data_json = aya_alist_json_encode($fs_data_atts);
+
     $post_query = array(
         'action' => 'alist_request_data',
         'nonce' => wp_create_nonce('alist_cli_data_nonce'),
-        'data_atts' => aya_alist_format_ajax_atts_encode($fs_data_atts),
+        'data_atts' => $data_json,
     );
+
     $build_body = http_build_query($post_query);
 
     //HTML结构
     $html = '';
 
     $html .= '<div id="' . $unique_id . '">';
-    $html .= '<div class="spinner" role="status"><span class="visually-hidden">LOADING...</span></div>';
+    $html .= '<div class="spinner" role="status"></div>';
     $html .= '</div>';
 
     $html .= "<script> (function () {
@@ -348,8 +342,9 @@ function aya_alist_callback_ajax_post()
         wp_die();
     }
     //解码
-    $data_base64 = base64_decode($_POST['data_atts']);
-    $data_query = aya_alist_json_decode($data_base64);
+    $data_json = stripslashes($_POST['data_atts']);
+
+    $data_query = aya_alist_json_decode($data_json);
 
     if ($data_query !== false) {
         echo aya_alist_template_workflow_main($data_query);
@@ -369,7 +364,7 @@ function aya_alist_template_workflow_main($fs_query)
             $atts_msg = __('路径参数不能为空', 'AIYA-ALIST');
         }
         //处理一下传入路径参数
-        $fs_query['path'] = aya_alist_path_slash_filter($fs_query['path']);
+        //$fs_query['path'] = aya_alist_path_slash_filter($fs_query['path']);
     }
     //搜索词检查
     else if ($fs_method == 'search') {
@@ -396,17 +391,19 @@ function aya_alist_template_workflow_main($fs_query)
         //根据关键词匹配报错信息
         if (strpos($fs_data, 'EOF') !== false) {
             $msg = __('本地服务器发送请求失败', 'AIYA-ALIST');
-        } else if (strpos($fs_data, '403') !== false) {
-            $msg = __('文件访问被拒绝，未设置的访问密码或用户没有权限', 'AIYA-ALIST');
+        } else if (strpos($fs_data, '400') !== false) {
+            $msg = __('请求参数错误', 'AIYA-ALIST');
         } else if (strpos($fs_data, '401') !== false) {
-            $msg = __('文件访问被拒绝，令牌失效，请检查', 'AIYA-ALIST');
+            $msg = __('令牌失效', 'AIYA-ALIST');
+        } else if (strpos($fs_data, '403') !== false) {
+            $msg = __('文件访问被拒绝', 'AIYA-ALIST');
         } else if (strpos($fs_data, '500') !== false) {
             $msg = __('文件/目录位置不存在，或搜索功能未就绪', 'AIYA-ALIST');
         } else {
-            $msg = $fs_data;
+            $msg = __('出错了', 'AIYA-ALIST');
         }
 
-        return aya_alist_template_error($msg);
+        return aya_alist_template_error($msg . '( ' . $fs_data . ' )');
     }
 
     //插件设置
@@ -415,7 +412,6 @@ function aya_alist_template_workflow_main($fs_query)
 
     //加载模板
     $html = '';
-    $html .= '<div class="container alist-container">';
 
     //根据传入方法切换加载模板 
     if ($fs_method == 'get') {
@@ -428,12 +424,10 @@ function aya_alist_template_workflow_main($fs_query)
 
     //加载文件描述
     if ($fs_data['readme'] != '' && $display_readme) {
-        $html .= '<p class="disc">' . $fs_data['readme'] . '</p>';
+        $html .= '<div class="readme">' . $fs_data['readme'] . '</div>';
     }
     //加载全局描述
     $html .= '<p class="disc">' . $overall_desc . '</p>';
-
-    $html .= '</div>';
 
     return $html;
 }
@@ -505,6 +499,8 @@ function aya_alist_template_file_tables($fs_data, $fs_query)
     $html .= '</tr></thead>';
     $html .= '<tbody>';
 
+    $fs_count = 0;
+
     foreach ($fs_data['content'] as $fs) {
         //跳过文件夹
         if ($ignore_dir && boolval($fs['is_dir'])) {
@@ -516,6 +512,13 @@ function aya_alist_template_file_tables($fs_data, $fs_query)
         $html .= '<td>' . aya_alist_format_file_size($fs) . '</td>';
         $html .= '<td>' . aya_alist_format_file_link($fs, $fs_query) . '</td>';
         $html .= '</tr>';
+        //计数器
+        $fs_count++;
+    }
+
+    //输出结果为空时
+    if ($fs_count === 0) {
+        $html .= '<td colspan="4">' . __('没有文件', 'AIYA-ALIST') . '</td>';
     }
 
     $html .= '</tbody>';
@@ -527,11 +530,62 @@ function aya_alist_template_file_tables($fs_data, $fs_query)
 //搜索结果模板
 function aya_alist_template_search_result($fs_data, $fs_query)
 {
-    echo '<pre>';
-    print_r($fs_data);
-    echo '</pre>';
+    //插件设置
+    $ignore_dir = aya_alist_opt('always_ignore_dir');
 
     $html = '';
+
+    $html .= '<h6 class="table-title mb-3">';
+    $html .= aya_alist_format_get_icon('search');
+    $html .= '搜索文件：' . $fs_query['keyword'];
+    $html .= '</h6>';
+
+    $html .= '<table class="table">';
+    $html .= '<thead><tr>';
+    $html .= '<th>' . __('文件', 'AIYA-ALIST') . '</th>';
+    $html .= '<th>' . __('日期', 'AIYA-ALIST') . '</th>';
+    $html .= '<th>' . __('大小', 'AIYA-ALIST') . '</th>';
+    $html .= '<th>' . __('链接', 'AIYA-ALIST') . '</th>';
+    $html .= '</tr></thead>';
+    $html .= '<tbody>';
+
+    $fs_count = 0;
+
+    foreach ($fs_data['content'] as $fs_data) {
+        //跳过文件夹
+        if ($ignore_dir && boolval($fs_data['is_dir'])) {
+            continue;
+        }
+
+        //因为搜索模式只能获取文件和路径，重新生成新的文件请求
+        $fs_query = [
+            'path' => $fs_data['parent'] . '/' . $fs_data['name'],
+            'password' => $fs_query['password'],
+            'refresh' => $fs_query['refresh'],
+            'query_method_is' => 'get',
+        ];
+
+        //获取文件
+        $fs = aya_alist_cli()->fs_request('get', $fs_query, true);
+
+        $html .= '<tr>';
+        $html .= '<td>' . aya_alist_format_file_name($fs) . '</td>';
+        $html .= '<td>' . aya_alist_format_file_date($fs) . '</td>';
+        $html .= '<td>' . aya_alist_format_file_size($fs) . '</td>';
+        $html .= '<td>' . aya_alist_format_file_link($fs, $fs_query) . '</td>';
+        $html .= '</tr>';
+        //计数器
+        $fs_count++;
+    }
+
+    //输出结果为空时
+    if ($fs_count === 0) {
+        $html .= '<td colspan="4">' . __('没有文件', 'AIYA-ALIST') . '</td>';
+    }
+
+    $html .= '</tbody>';
+    $html .= '</table>';
+
 
     $html .= '';
     return $html;
