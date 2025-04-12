@@ -1,0 +1,193 @@
+.alist-container {
+  max-width: var(--alist-cli-container-max-width);
+  margin: 2rem auto;
+  /* 卡片样式 */
+  /* 列表样式 */
+  /* 通用样式 */
+}
+@media (max-width: 480px) {
+  .alist-container {
+    margin: 1rem;
+  }
+}
+.alist-container .spinner,
+.alist-container .spinner:before,
+.alist-container .spinner:after {
+  border-radius: 50%;
+  width: 2.5em;
+  height: 2.5em;
+  -webkit-animation-fill-mode: both;
+  animation-fill-mode: both;
+  -webkit-animation: load 1.8s infinite ease-in-out;
+  animation: load 1.8s infinite ease-in-out;
+}
+.alist-container .spinner {
+  color: var(--alist-cli-main-color);
+  font-size: 10px;
+  margin: 80px auto;
+  position: relative;
+  text-indent: -9999em;
+  -webkit-transform: translateZ(0);
+  -ms-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-animation-delay: -0.16s;
+  animation-delay: -0.16s;
+}
+.alist-container .spinner:before,
+.alist-container .spinner:after {
+  content: '';
+  position: absolute;
+  top: 0;
+}
+.alist-container .spinner:before {
+  left: -3.5em;
+  -webkit-animation-delay: -0.32s;
+  animation-delay: -0.32s;
+}
+.alist-container .spinner:after {
+  left: 3.5em;
+}
+.alist-container .card-flex {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: center;
+}
+.alist-container .card {
+  position: relative;
+  min-width: 220px;
+  background: var(--alist-cli-card-background);
+  border-radius: var(--alist-cli-card-border-radius);
+  box-shadow: var(--alist-cli-card-box-shadow);
+  padding: 1.5rem;
+}
+.alist-container .card .card-title {
+  color: #333;
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin: 0;
+}
+.alist-container .details {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.75rem 1.5rem;
+  margin: 0;
+}
+.alist-container .details dt {
+  color: #666;
+  font-size: 0.9rem;
+}
+.alist-container .details dd {
+  color: #333;
+  font-weight: 500;
+  margin: 0;
+  font-size: 0.9rem;
+}
+.alist-container .table-title {
+  color: #333;
+  font-size: 1rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background: color-mix(in srgb, var(--alist-cli-card-background) 90%, black);
+  box-shadow: var(--alist-cli-card-box-shadow);
+  border-radius: var(--alist-cli-card-border-radius);
+  margin: 0;
+}
+.alist-container .table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  background: var(--alist-cli-card-background);
+  box-shadow: var(--alist-cli-card-box-shadow);
+  border-radius: var(--alist-cli-card-border-radius);
+  overflow: hidden;
+}
+.alist-container .table thead {
+  background: color-mix(in srgb, var(--alist-cli-card-background) 90%, black);
+}
+.alist-container .table th {
+  padding: 0.5rem;
+  text-align: left;
+  font-weight: 500;
+  color: #666;
+  font-size: 0.9rem;
+  border-bottom: 1px solid #eee;
+}
+.alist-container .table td {
+  padding: 0.5rem;
+  border-bottom: 1px solid #eee;
+  vertical-align: middle;
+}
+.alist-container .table tr:last-child td {
+  border-bottom: none;
+}
+.alist-container .table tr:nth-child(even) {
+  background: color-mix(in srgb, var(--alist-cli-card-background) 98%, black);
+}
+.alist-container .icon-mr-s {
+  margin-right: 0.2rem;
+}
+.alist-container .icon-alert {
+  font-size: 2rem;
+}
+.alist-container .split-line {
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  border: 1px solid #eee;
+}
+.alist-container .row-link {
+  text-align: center;
+  margin-top: 1.5rem;
+}
+.alist-container .down-btn {
+  font-size: 1rem;
+  background: var(--alist-cli-main-color);
+  color: white !important;
+  min-width: 4rem;
+  text-decoration: none;
+  padding: 0.3rem 0.6rem;
+  border-radius: var(--alist-cli-card-border-radius);
+  display: inline-block;
+  text-align: center;
+  transition: background 0.2s;
+}
+.alist-container .down-btn-disabled {
+  background: var(--alist-cli-main-color-hover);
+  pointer-events: none;
+}
+.alist-container .down-btn:hover {
+  background: var(--alist-cli-main-color-hover);
+}
+.alist-container .disc {
+  position: relative;
+  font-size: 0.9rem;
+  margin: 1rem 0 0 0;
+  display: flex;
+  justify-content: center;
+}
+.alist-container .alert .msg {
+  font-size: 1rem;
+  line-height: 1.6;
+}
+@-webkit-keyframes load {
+  0%,
+  80%,
+  100% {
+    box-shadow: 0 2.5em 0 -1.3em;
+  }
+  40% {
+    box-shadow: 0 2.5em 0 0;
+  }
+}
+@keyframes load {
+  0%,
+  80%,
+  100% {
+    box-shadow: 0 2.5em 0 -1.3em;
+  }
+  40% {
+    box-shadow: 0 2.5em 0 0;
+  }
+}

@@ -26,9 +26,8 @@ if (file_exists(AYA_ALIST_PLUGIN_PATH . 'framework-required/setup.php')) {
 //引入 Alist 接口SDK文件
 require_once AYA_ALIST_PLUGIN_PATH . 'lib/Http_Request.php';
 require_once AYA_ALIST_PLUGIN_PATH . 'lib/Alist_API.php';
-//设置页面
-require_once AYA_ALIST_PLUGIN_PATH . 'inc/client-option.php';
 //插件文件
 require_once AYA_ALIST_PLUGIN_PATH . 'inc/client-public.php';
+require_once AYA_ALIST_PLUGIN_PATH . 'inc/client-option.php';
 require_once AYA_ALIST_PLUGIN_PATH . 'inc/client-templates.php';
 require_once AYA_ALIST_PLUGIN_PATH . 'inc/client-shortcode.php';

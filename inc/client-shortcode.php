@@ -3,13 +3,11 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-add_shortcode('alist_dev', 'aya_alist_shortcode_methods');
-
-function aya_alist_shortcode_methods($atts = array(), $content = null)
-{
-    //print_r(aya_alist_permission_check());
-    return;
-}
+/*
+ * ------------------------------------------------------------------------------
+ * 直链短代码
+ * ------------------------------------------------------------------------------
+ */
 
 //请求文件直链
 add_shortcode('alist_raw_url', 'aya_alist_cli_shortcode_get_raw_url');
@@ -36,61 +34,111 @@ function aya_alist_cli_shortcode_get_raw_url($atts = array(), $content = null)
     }
     //检查是否为文件夹
     if (boolval($fs['is_dir'])) {
-        return __('目标路径为文件夹，项目不可用', 'AIYA-ALIST');
+        return 'The path is a folder, and the project is not available';
     }
 
-    //$fs['raw_url']
-    return print_r($fs);
+    return $fs['raw_url'];
 }
 
+/*
+ * ------------------------------------------------------------------------------
+ * 接口端短代码
+ * ------------------------------------------------------------------------------
+ */
+
 //请求完整列表
-add_shortcode('alist_list', 'aya_alist_cli_shortcode_fs_methods');
+add_shortcode('alist_cli', 'aya_alist_cli_shortcode_fs_methods');
 
 function aya_alist_cli_shortcode_fs_methods($atts = array(), $content = null)
 {
-
     $atts = shortcode_atts(
         array(
-            'method' => 'get', //by:list by:search
+            'method' => '',
             'path' => '/',
             'password' => '',
             //'page' => 1,
-            //'per_page' => 0,
-            'refresh' => false,
+            'per_page' => 0,
             //'force_root' => false,
             'parent' => '',
             'keyword' => '',
-            'scope' => 2, //0:all 1:file 2:dir
+            'scope' => 2, //0:all 1:dir 2:file
+            'refresh' => false,
         ),
         $atts,
     );
 
+    //提取短代码参数
     $method = trim($atts['method']);
-    $path = trim($atts['path']);
+    $per_page = intval($atts['per_page']);
     $pswd = trim($atts['password']);
-}
-
-//请求完整文件列表（Ajax）
-add_shortcode('alist_list_ajax', 'aya_alist_cli_shortcode_fs_methods_ajax');
-function aya_alist_cli_shortcode_fs_methods_ajax($atts = array(), $content = null)
-{
-    $atts = shortcode_atts(
-        array(
-            'method' => 'get', //by:list by:search
-            'path' => '/',
-            'password' => '',
-            //'page' => 1,
-            //'per_page' => 0,
-            'refresh' => false,
-            //'force_root' => false,
-            'parent' => '',
-            'keyword' => '',
-            'scope' => 2, //0:all 1:file 2:dir
-        ),
-        $atts,
-    );
-
-    $method = trim($atts['method']);
     $path = trim($atts['path']);
-    $pswd = trim($atts['password']);
+    $refresh = filter_var($atts['refresh'], FILTER_VALIDATE_BOOLEAN);
+
+    //插件设置
+    $ajax_load = aya_alist_opt('ajax_load');
+    $default_per_page = intval(aya_alist_opt('per_page_num'));
+
+    //分页计算
+    $per_page_num = ($per_page == 0) ? $default_per_page : $per_page;
+    $get_page = (empty($_GET['page_a'])) ? 1 : intval($_GET['page_a']);
+    $page = ($per_page_num == 0) ? 1 : $get_page;
+
+    //开始配置请求参数
+    $fs_query = array();
+
+    $fs_query['page'] = $page;
+    $fs_query['per_page'] = $per_page_num;
+    $fs_query['password'] = $pswd;
+
+    if ($method == 'get') {
+        //加载为文件详情
+        $fs_query['path'] = $path;
+        $fs_query['refresh'] = $refresh;
+
+    } else if ($method == 'list') {
+        //加载为文件列表
+        $fs_query['path'] = $path;
+        $fs_query['refresh'] = $refresh;
+
+        //检查路径是文件则切换为get方法
+        if (aya_alist_guess_is_file($path)) {
+            $method = 'get';
+        }
+
+    } else if ($method == 'search') {
+        //加载为搜索列表
+        $parent = trim($atts['parent']);
+        $keyword = do_shortcode(trim($atts['keyword']));
+        $scope = intval($atts['scope']);
+
+        //如果没有配置根目录参数但配置了路径，则切换
+        if ($parent == '' && $path != '') {
+            $parent = $path;
+        }
+
+        $fs_query['parent'] = $parent;
+        $fs_query['keyword'] = $keyword;
+        $fs_query['scope'] = $scope;
+    } else {
+        $method = 'null';
+        $content = __('未定义的请求方法', 'AIYA-ALIST');
+    }
+
+    $fs_query['query_method_is'] = $method;
+
+    $html = '';
+
+    //异步模式
+    if ($ajax_load) {
+        $html .= aya_alist_template_ajax_post($fs_query);
+    } else {
+        //直接加载
+        $html .= aya_alist_template_workflow_main($fs_query);
+    }
+    //默认内容
+    if ($content != '') {
+        $html .= do_shortcode($content);
+    }
+
+    return $html;
 }

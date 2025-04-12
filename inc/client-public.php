@@ -12,6 +12,10 @@ if (!defined('ABSPATH')) {
 //取出设置
 function aya_alist_opt($opt_name)
 {
+    if (!class_exists('AYF')) {
+        return false;
+    }
+
     return AYF::get_opt('alist_client_' . $opt_name, 'alist');
 }
 
@@ -25,6 +29,18 @@ function aya_alist_json_encode($data)
     }
 
     return $json;
+}
+
+//JSON解码
+function aya_alist_json_decode($data)
+{
+    $array = json_decode($data, true);
+
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        return false;
+    }
+
+    return $array;
 }
 
 //获取服务器地址
@@ -108,17 +124,6 @@ function aya_alist_refresh_token()
     }
 }
 
-//返回 Alist 接口对象
-function aya_alist_cli()
-{
-    $server = aya_alist_server_url();
-    $token = aya_alist_transient_token();
-
-    $alist_cli = new Alist_API($server, $token);
-
-    return $alist_cli;
-}
-
 //验证Token权限
 function aya_alist_permission_check()
 {
@@ -137,4 +142,34 @@ function aya_alist_permission_check()
     }
 
     return true;
+}
+
+//返回 Alist 接口对象
+function aya_alist_cli()
+{
+    $server = aya_alist_server_url();
+    $token = aya_alist_transient_token();
+
+    $alist_cli = new Alist_API($server, $token);
+
+    return $alist_cli;
+}
+
+//判断字符串路径是否为文件
+function aya_alist_guess_is_file($path)
+{
+    if (preg_match('/\.[a-z0-9]+$/i', $path)) {
+        return true;
+    } else {
+        return false;
+    }
+
+}
+
+//处理路径格式
+function aya_alist_path_slash_filter($path)
+{
+    $path = trim($path, '/');
+
+    return '/' . $path;
 }

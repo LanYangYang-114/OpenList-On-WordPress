@@ -9,8 +9,29 @@ if (!defined('ABSPATH')) {
  * ------------------------------------------------------------------------------
  */
 
+//样式表文件
+add_action('wp_enqueue_scripts', 'aya_alist_plugin_enqueue_scripts');
 //在主题之后加载
 add_action('after_setup_theme', 'aya_alist_server_option_page');
+//在头部添加样式
+add_action('wp_head', 'aya_alist_plugin_add_style');
+
+//注册静态文件
+function aya_alist_plugin_enqueue_scripts()
+{
+    wp_register_style('bootstrap-icons', AYA_ALIST_PLUGIN_URL . '/assets/css/bootstrap-icons.min.css', array(), '1.11.3', 'all');
+    wp_register_style('alist-client', AYA_ALIST_PLUGIN_URL . '/assets/css/alist-style.css', array(), '1.1.0', 'all');
+
+    wp_enqueue_style('alist-client');
+
+    if (aya_alist_opt('view_icon_type') != 'false') {
+        wp_enqueue_style('bootstrap-icons');
+    }
+}
+function aya_alist_plugin_add_style()
+{
+    print ('<style>' . aya_alist_opt('custom_css') . '</style>');
+}
 
 //设置表单
 function aya_alist_server_option_page()
@@ -32,15 +53,15 @@ function aya_alist_server_option_page()
                 ],
                 [
                     'type' => 'content',
-                    'desc' => '文件/文件夹详情：[code][alist_cli method="get" path="/readme.md" password="" refresh="false"][/alist_cli][/code]',
+                    'desc' => '文件/目录详情：[code][alist_cli method="get" path="/readme.md" password="" refresh="false"][/alist_cli][/code]',
                 ],
                 [
                     'type' => 'content',
-                    'desc' => '文件/文件夹列表：[code][alist_cli method="list" path="/" password="" refresh="false"][/alist_cli][/code]',
+                    'desc' => '列出文件目录：[code][alist_cli method="list" path="/" password="" refresh="false"][/alist_cli][/code]',
                 ],
                 [
                     'type' => 'content',
-                    'desc' => '搜索结果：[code][alist_cli method="search" parent="/" keyword="关键词" scope="2" password=""][/alist_cli][/code]',
+                    'desc' => '搜索文件或文件夹：[code][alist_cli method="search" parent="/" keyword="关键词" scope="2" password=""][/alist_cli][/code]',
                 ],
                 [
                     'type' => 'content',
@@ -50,10 +71,6 @@ function aya_alist_server_option_page()
                     'desc' => 'Alist 服务器接口',
                     'type' => 'title_1',
                 ],
-                //[
-                //    'type' => 'callback',
-                //    'function' => 'aya_alist_server_clear_token_button',
-                //],
                 aya_alist_server_option_test_request(),
                 [
                     'title' => '服务器地址',
@@ -64,31 +81,28 @@ function aya_alist_server_option_page()
                 ],
                 [
                     'title' => '用户名',
-                    'desc' => 'Alist 的用户名，用于请求 Alist API 认证',
+                    'desc' => 'Alist 用户名，用于请求 Alist API 认证',
                     'id' => 'alist_client_api_user',
                     'type' => 'text',
                     'default' => 'username',
                 ],
                 [
                     'title' => '密码',
-                    'desc' => 'Alist 的用户密码，用于请求 Alist API 认证',
+                    'desc' => 'Alist 用户密码，用于请求 Alist API 认证',
                     'id' => 'alist_client_api_pswd',
                     'type' => 'text',
                     'default' => 'password',
                 ],
-                //[
-                //    'desc' => 'Tips： Alist 的令牌（JWt Token）的有效期取决于 Alist 的设置，默认为 48 小时。',
-                //    'type' => 'message',
-                //],
                 [
                     'title' => '令牌缓存时间',
-                    'desc' => 'Alist 的 JWt Token 缓存时间（小时），设置为 [code]0[/code] 则每次都重新请求令牌',
+                    'desc' => 'Alist 的 JWt Token 缓存时间（小时），设置为 [code]0[/code] 则每次都重新请求令牌
+                    [br/] * 取决于 Alist 的config.json配置，默认为 48 小时',
                     'id' => 'alist_client_token_expire_hours',
                     'type' => 'text',
                     'default' => '48',
                 ],
                 [
-                    'desc' => 'Alist 列表设置',
+                    'desc' => 'Alist 客户端设置',
                     'type' => 'title_1',
                 ],
                 [
@@ -99,53 +113,104 @@ function aya_alist_server_option_page()
                     'default' => true,
                 ],
                 [
-                    'title' => '获取文件图标',
-                    'desc' => '为文件获取图标，使用 bootstrap-icons 图标库',
-                    'id' => 'alist_client_view_icon',
-                    'type' => 'radio',
-                    'sub' => [
-                        'off' => '禁用',
-                        'ext' => '匹配文件后缀',
-                        'typ' => '匹配文件类型',
-                    ],
-                    'default' => 'typ',
+                    'title' => '自动分页',
+                    'desc' => '当返回结果超过指定数量时自动分页，设置为 [code]0[/code] 时不分页
+                    [br/]* 此选项可被短代码中的 [code]per_page=""[/code] 参数覆盖',
+                    'id' => 'alist_client_per_page_num',
+                    'type' => 'text',
+                    'default' => '0',
                 ],
                 [
-                    'title' => '下载链接设置',
-                    'desc' => '配置在文件列表中显示 Alist 的文件链接[br/]文件页面：直接返回文件详情页面（不会附带文件签名）[br/]下载地址：拼接文件的下载地址（请求[code]/d/[/code]路径）[br/]下载地址（代理）：拼接文件的下载地址（请求[code]/p/[/code]路径）',
-                    'id' => 'alist_client_view_link_type',
-                    'type' => 'checkbox',
+                    'title' => '文件图标切换',
+                    'desc' => '为文件匹配获取图标（使用 bootstrap-icons 图标库）',
+                    'id' => 'alist_client_view_icon_type',
+                    'type' => 'radio',
                     'sub' => [
-                        'page' => '文件页面',
-                        'down' => '下载地址',
-                        'proxy' => '下载地址（通过代理）',
-                        'raw' => '直接取出直链',
+                        'false' => '禁用',
+                        'type' => '后缀名',
+                        'file' => '默认',
+                        'file_fill' => '默认（填充）',
+                        'earmark' => '折页',
+                        'earmark_fill' => '折页（填充）',
                     ],
-                    'default' => 'page',
+                    'default' => 'file',
+                ],
+                [
+                    'title' => '链接设置',
+                    'desc' => '设置文件列表和文件卡片中链接的跳转位置
+                    [br/]文件页面：跳转到 Alist 的文件/文件夹详情页面
+                    [br/]直接下载：直接下载 Alist 的文件（由 Alist 自身完成 302 跳转）
+                    [br/]提取直链：直接取出 Alist 的文件真实文件地址',
+                    'id' => 'alist_client_view_link_type',
+                    'type' => 'radio',
+                    'sub' => [
+                        'page_rf' => '文件页面',
+                        'down_rf' => '直接下载',
+                        'raw_url' => '提取直链',
+                    ],
+                    'default' => 'down_rf',
+                ],
+                [
+                    'title' => '列表时忽略目录',
+                    'desc' => '在返回的文件列表中忽略的目录（只显示文件）',
+                    'id' => 'alist_client_always_ignore_dir',
+                    'type' => 'switch',
+                    'default' => true,
+                ],
+                [
+                    'title' => '显示 readme 内容',
+                    'desc' => '如果获取到 Alist 中设置的 readme.md 内容，输出于短代码内容结束之前',
+                    'id' => 'alist_client_display_readme',
+                    'type' => 'switch',
+                    'default' => false,
+                ],
+                [
+                    'title' => '全局列表描述',
+                    'desc' => '设置默认列表描述，输出于短代码内容结束之前',
+                    'id' => 'alist_client_overall_desc',
+                    'type' => 'textarea',
+                    'default' => '文件下载由 your.alsitserver.name 提供支持',
+                ],
+                [
+                    'desc' => 'Alist 自定义CSS',
+                    'type' => 'title_1',
+                ],
+                [
+                    //'title' => '文件列表样式',
+                    'desc' => '添加自定义的 CSS 样式',
+                    'id' => 'alist_client_custom_css',
+                    'type' => 'code_editor',
+                    'settings' => [
+                        'lineNumbers' => true,
+                        'tabSize' => 0,
+                        'theme' => 'monokai',
+                        'mode' => 'css',
+                    ],
+                    'default' => aya_alist_server_default_style_var(),
+
                 ],
             ],
         ]
     );
-    
+
     if (is_admin()) {
         //初始化简码输入框组件按钮
         AYA_Shortcode::instance();
 
-        AYA_Shortcode::shortcode_register('hidden-content', array(
+        AYA_Shortcode::shortcode_register('alist-client', array(
             'id' => 'sc-alist-client',
             'title' => 'Alist 客户端',
             'note' => 'Alist 客户端的请求体调用',
-            'template' => '[alist_cli {{attributes}}] {{content}} [/alist_cli]',
+            'template' => '[alist_cli {{attributes}}]{{content}}[/alist_cli]',
             'field_build' => array(
                 [
                     'id' => 'method',
-                    'type'  => 'select',
+                    'type' => 'select',
                     'label' => '请求方法',
-                    'desc'  => '选择请求方法',
+                    'desc' => '选择请求方法',
                     'sub' => [
-                        'list' => '列表',
-                        'get' => '详情',
-                        'search' => '搜索',
+                        'list' => '列出文件目录',
+                        'get' => '获取文件/目录信息',
                     ],
                     'default' => 'list',
                 ],
@@ -153,30 +218,93 @@ function aya_alist_server_option_page()
                     'id' => 'path',
                     'type' => 'text',
                     'label' => '路径',
-                    'desc' => '请求的路径',
+                    'desc' => '请求的目录或文件路径',
                     'default' => '/',
-                ],
-                [
-                    'id' => 'refresh',
-                    'type'  => 'checkbox',
-                    'label' => '强制刷新',
-                    'desc' => '是否强制刷新',
-                    'default' => false,
                 ],
                 [
                     'id' => 'content',
                     'type' => 'textarea',
                     'label' => '描述',
-                    'desc' => '在这里输入描述文本',
+                    'desc' => '在页面中显示的描述文本（支持短代码嵌套）',
                     'default' => '',
-                ]
+                ],
+                [
+                    'id' => 'refresh',
+                    'type' => 'checkbox',
+                    'label' => '强制刷新',
+                    'desc' => '是否强制刷新（跳过SQL缓存）',
+                    'default' => false,
+                ],
             )
         ));
-        AYA_Shortcode::instance();
+        AYA_Shortcode::shortcode_register('alist-search', array(
+            'id' => 'sc-alist-search',
+            'title' => '在 Alist 中搜索',
+            'note' => 'Alist 客户端的请求体调用',
+            'template' => '[alist_cli {{attributes}}]{{content}}[/alist_cli]',
+            'field_build' => array(
+                [
+                    'id' => 'method',
+                    'type' => 'select',
+                    'label' => '请求方法',
+                    'desc' => '选择请求方法',
+                    'sub' => [
+                        'search' => '搜索文件/文件夹',
+                    ],
+                    'default' => 'search',
+                ],
+                [
+                    'id' => 'parent',
+                    'type' => 'text',
+                    'label' => '搜索目录',
+                    'desc' => '搜索的目录路径',
+                    'default' => '/',
+                ],
+                [
+                    'id' => 'keyword',
+                    'type' => 'text',
+                    'label' => '关键词',
+                    'desc' => '搜索的关键词（支持短代码嵌套）',
+                    'default' => '',
+                ],
+                [
+                    'id' => 'scope',
+                    'type' => 'select',
+                    'label' => '搜索类型',
+                    'desc' => '仅搜索文件或文件夹',
+                    'sub' => [
+                        '0' => '全部',
+                        '1' => '文件夹',
+                        '2' => '文件',
+                    ],
+                    'default' => '2',
+                ],
+                [
+                    'id' => 'content',
+                    'type' => 'textarea',
+                    'label' => '描述',
+                    'desc' => '在页面中显示的描述文本（支持短代码嵌套）',
+                    'default' => '',
+                ],
+            )
+        ));
     }
 }
 
-//服务器测试流程
+//定义默认的前台样式变量
+function aya_alist_server_default_style_var()
+{
+    return ".alist-container {
+    --alist-cli-container-max-width: 670px;
+    --alist-cli-main-color: linear-gradient(135deg, #c850c0, #4158d0);
+    --alist-cli-main-color-hover: linear-gradient(35deg, #4158d0, #c850c0);
+    --alist-cli-card-background: #fff;
+    --alist-cli-card-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    --alist-cli-card-border-radius: 5px;
+}";
+}
+
+//服务器测试
 function aya_alist_server_option_test_request()
 {
     //未初始化
@@ -197,7 +325,7 @@ function aya_alist_server_option_test_request()
         ];
     }
 
-    //aya_alist_refresh_token();
+    aya_alist_refresh_token();
 
     $get_token = aya_alist_transient_token();
 
@@ -224,134 +352,4 @@ function aya_alist_server_option_test_request()
         'desc' => '连接成功！ Alist 存储连接正常',
         'type' => 'success',
     ];
-}
-
-
-
-//add_action('after_setup_theme', 'aya_alist_server_option');
-//add_action('wp_enqueue_scripts', 'aya_alist_plugin_enqueue_scripts');
-
-//注册静态文件
-function aya_alist_plugin_enqueue_scripts()
-{
-    $url_cdn = '//cdnjs.cloudflare.com/ajax/libs';
-    //$url_cdn = '//s4.zstatic.net/ajax/libs';
-
-    wp_register_script('bootstrap', $url_cdn . '/bootstrap/5.3.3/js/bootstrap.min.js', array(), '5.3.3', true);
-    wp_register_style('bootstrap', $url_cdn . '/bootstrap/5.3.3/css/bootstrap.min.css', array(), '5.3.3', 'all');
-    wp_register_style('bootstrap-icons', $url_cdn . '/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css', array(), '1.11.3', 'all');
-
-    wp_enqueue_script('bootstrap');
-    wp_enqueue_style('bootstrap');
-    wp_enqueue_style('bootstrap-icons');
-}
-
-//添加设置选项
-function aya_alist_server_option()
-{
-    //设置表单
-    AYF::new_opt(array(
-        'title' => 'AIYA-AlistClient',
-        'slug' => 'alist',
-        'desc' => 'AIYA-CMS 主题， Alist文件列表服务器接入插件',
-        'fields' => array(
-            array(
-                'type' => 'message',
-                'desc' => 'Alist 服务器需要在公开网络下可用，如果设置为 [code] http://127.0.0.1:5244 [/code] 使用时请启用直链获取设置',
-            ),
-            array(
-                'desc' => 'Alist 列表设置',
-                'type' => 'title_2',
-            ),
-            array(
-                'title' => '默认列表描述',
-                'desc' => '设置默认列表描述，输出于短代码 [code]content[/code] 之前',
-                'id' => 'site_alist_list_desc',
-                'type' => 'textarea',
-                'default' => '文件下载由 your.alsitserver.name 提供支持',
-            ),
-            array(
-                'title' => '异步加载',
-                'desc' => '使用 AJAX 加载文件列表，而不是在页面中加载',
-                'id' => 'site_alist_ajax_mode',
-                'type' => 'switch',
-                'default' => true,
-            ),
-            array(
-                'title' => '获取文件直链（不推荐）',
-                'desc' => '直接返回已解析的真实文件地址，而不是返回 Alist 的链接地址',
-                'id' => 'site_alist_get_raw_url',
-                'type' => 'switch',
-                'default' => false,
-            ),
-            /*
-            array(
-                'desc' => 'Alist 自动功能',
-                'type' => 'title_2',
-            ),
-            array(
-                'title' => '自动为文章创建文件夹',
-                'desc' => '在文章发布时，通过 Alist 接口为文章创建文件夹结构',
-                'id' => 'site_alist_create_folder',
-                'type' => 'switch',
-                'default' => false,
-            ),
-            array(
-                'title' => '选择驱动器',
-                'desc' => '[b]必选！[/b]设置程序自动创建文件夹时，创建在哪个驱动器下',
-                'id' => 'site_alist_create_folder_drive',
-                'type' => 'radio',
-                'sub'  => aya_alist_server_list_request(),
-                'default' => 'false',
-            ),
-            array(
-                'title' => '选择文件夹格式',
-                'desc' => '[b]必选！[/b]设置程序自动创建文件夹时，文件夹名字格式',
-                'id' => 'site_alist_create_folder_format',
-                'type' => 'radio',
-                'sub'  => array(
-                    'by_title' => '/文章标题',
-                    'by_date' => '/Y-m-d',
-                    'by_id' => '/POST_ID',
-                    'by_date_id' => '/POST_ID_Ymd',
-                ),
-                'default' => 'false',
-            ),
-            */
-            array(
-                'desc' => 'Alist 自定义CSS',
-                'type' => 'title_2',
-            ),
-            array(
-                //'title' => '文件列表样式',
-                'desc' => '添加自定义的 CSS 样式',
-                'id' => 'site_alist_custom_css',
-                'type' => 'code_editor',
-                'settings' => array(
-                    'lineNumbers' => true,
-                    'tabSize' => 0,
-                    'theme' => 'monokai',
-                    'mode' => 'css',
-                ),
-                'default' => '.alist-container{    
-  .spinner-alist{
-    color: linear-gradient(135deg, #c850c0, #4158d0);
-  }
-  .btn-alist-down {
-    background: linear-gradient(135deg, #c850c0, #4158d0);
-    border-color: #fff;
-    color: #fff;
-  }
-  .btn-alist-down:hover {
-    background: background: linear-gradient(135deg, #a1c4fd, #c2e9fb);/*transparent*/;
-    border-color: #333;
-    color: #fff;
-  }
-  .content-alist{
-    color: #eee;
-  }
-}',
-            ),
-        ),
-    ));
 }
