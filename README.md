@@ -1,6 +1,6 @@
 ## Alist 文件列表客户端插件 for WordPress
 
-![截图](https://github.com/yeraph-plus/alist-client-plugin-for-wordpress/blob/master/screenshot/2025-04-13%081411.png)
+![截图](https://github.com/yeraph-plus/alist-client-plugin-for-wordpress/blob/master/screenshot/2025-04-13%20081411.png?raw=true)
 
 使用 WordPress 短代码功能在文章中插入 Alist 服务器中的文件链接，通过 Alist 托管站点的文件下载。
 
@@ -30,9 +30,7 @@
 
 7. 如果配置短代码参数 `refresh="ture"` ，会使 Alist 跳过自身缓存直接从网盘位置获取文件，通常不建议使用。
 
-8. 插件默认使用异步加载，但某些主题不支持，可切换为同步加载，但是会拖慢页面加载速度。
-
-9. 有使用问题/功能建议请提 issue ，随缘处理。
+有使用问题/功能建议请提 issue ，随缘处理。
 
 ### 短代码参数说明
 
