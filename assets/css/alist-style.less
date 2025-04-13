@@ -146,6 +146,63 @@
         }
     }
 
+    /* 分页 */
+    .pagination {
+        margin: 1rem 0;
+        width: 100%;
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        li {
+            display: inline-block;
+        }
+
+        .page-btn,
+        .page-btn-disabled {
+            display: block;
+            padding: 0.4rem 0.8rem;
+            background: var(--alist-cli-card-background);
+            border: 1px solid #eee;
+            border-radius: var(--alist-cli-card-border-radius);
+            transition: all 0.2s ease;
+            font-size: 1rem;
+            text-decoration: none;
+        }
+
+        .page-btn {
+            background: var(--alist-cli-card-background);
+            color: #333;
+        }
+
+        .page-btn-disabled {
+            background: var(--alist-cli-main-color-hover);
+            pointer-events: none;
+            color: #fff;
+        }
+
+        .page-btn:hover {
+            background: var(--alist-cli-main-color-hover);
+            color: #fff;
+        }
+
+        .total-disc {
+            white-space: nowrap;
+            margin-left: 2rem;
+            font-size: 0.9em;
+        }
+    }
+
+
     /* 通用样式 */
     .icon-mr-s {
         margin-right: 0.2rem;
@@ -176,7 +233,7 @@
         border-radius: var(--alist-cli-card-border-radius);
         display: inline-block;
         text-align: center;
-        transition: background 0.2s;
+        transition: all 0.5s ease;
     }
 
     .down-btn-disabled {
@@ -188,14 +245,18 @@
         background: var(--alist-cli-main-color-hover);
     }
 
-    .readme {}
+    .readme {
+        position: relative;
+        font-size: 0.9rem;
+        margin: 1rem 0;
+    }
 
     .disc {
         position: relative;
         font-size: 0.9rem;
         margin: 1rem 0 0 0;
-        display: flex;
-        justify-content: center;
+        white-space: wrap;
+        line-height: 1.6;
     }
 
     .alert {

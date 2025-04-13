@@ -140,7 +140,6 @@ function aya_alist_icon_array_map()
 //根据文件名提取图标
 function aya_alist_format_get_icon($icon_name, $icon_class = 'icon-mr-s')
 {
-
     return '<i class="bi bi-' . $icon_name . ' ' . $icon_class . '"></i>';
 }
 
@@ -253,20 +252,43 @@ function aya_alist_format_file_link($fs_data, $fs_query)
 }
 
 //计算分页
-function aya_alist_format_page($page, $per_page, $total)
+function aya_alist_format_page_item($page, $per_page, $total)
 {
-    //计算总页数
+    //总页数
     $total_page = ceil($total / $per_page);
+    $page = intval($page);
 
-    //计算当前页
-    if ($page > $total_page) {
-        $page = $total_page;
-    } else if ($page < 1) {
-        $page = 1;
-    }
+    //分页参数名
+    $page_param = 'page_a';
 
     $page_html = '';
-    $page_html .= '';
+
+    $page_html .= '<div class="pagination">';
+
+    //总页数大于1时开始分页
+    if ($total_page > 1) {
+        $page_html .= '<ul>';
+
+        //循环
+        for ($i = 1; $i <= $total_page; $i++) {
+
+            $page_html .= '<li class="page-num-' . $i . '">';
+
+            if ($i == $page) {
+                $page_html .= '<a class="page-btn-disabled">' . $i . '</a>';
+            } else {
+                $page_html .= '<a class="page-btn" href="?' . $page_param . '=' . $i . '" >' . $i . '</a>';
+            }
+
+            $page_html .= '</li>';
+
+        }
+
+        $page_html .= '</ul>';
+    }
+
+    $page_html .= '<div class="total-disc">' . __('共计 ', 'AIYA-ALIST') . $total . __(' 个文件', 'AIYA-ALIST') . '</div>';
+    $page_html .= '</div>';
 
     return $page_html;
 }
@@ -364,14 +386,15 @@ function aya_alist_template_workflow_main($fs_query)
             $atts_msg = __('路径参数不能为空', 'AIYA-ALIST');
         }
         //处理一下传入路径参数
-        //$fs_query['path'] = aya_alist_path_slash_filter($fs_query['path']);
+        $fs_query['path'] = aya_alist_path_slash_filter($fs_query['path']);
     }
     //搜索词检查
     else if ($fs_method == 'search') {
         //如果关键词为空，则返回报错
-        if ($fs_query['keyword'] == '') {
+        if ($fs_query['keywords'] == '') {
             $atts_msg = __('未设置搜索关键词', 'AIYA-ALIST');
         }
+        $fs_query['keywords'] = trim($fs_query['keywords']);
     }
     //未指定的方法
     else {
@@ -399,11 +422,13 @@ function aya_alist_template_workflow_main($fs_query)
             $msg = __('文件访问被拒绝', 'AIYA-ALIST');
         } else if (strpos($fs_data, '500') !== false) {
             $msg = __('文件/目录位置不存在，或搜索功能未就绪', 'AIYA-ALIST');
+        } else if (strpos($fs_data, 'your.alsitserver.name') !== false) {
+            $msg = __('请先完成后台设置', 'AIYA-ALIST');
         } else {
             $msg = __('出错了', 'AIYA-ALIST');
         }
 
-        return aya_alist_template_error($msg . '( ' . $fs_data . ' )');
+        return aya_alist_template_error($msg . ' (' . $fs_data . ') ');
     }
 
     //插件设置
@@ -524,6 +549,9 @@ function aya_alist_template_file_tables($fs_data, $fs_query)
     $html .= '</tbody>';
     $html .= '</table>';
 
+    //分页
+    $html .= aya_alist_format_page_item($fs_query['page'], $fs_query['per_page'], $fs_data['total']);
+
     return $html;
 }
 
@@ -537,7 +565,7 @@ function aya_alist_template_search_result($fs_data, $fs_query)
 
     $html .= '<h6 class="table-title mb-3">';
     $html .= aya_alist_format_get_icon('search');
-    $html .= '搜索文件：' . $fs_query['keyword'];
+    $html .= '搜索文件：' . $fs_query['keywords'];
     $html .= '</h6>';
 
     $html .= '<table class="table">';
@@ -559,8 +587,8 @@ function aya_alist_template_search_result($fs_data, $fs_query)
 
         //因为搜索模式只能获取文件和路径，重新生成新的文件请求
         $fs_query = [
-            'path' => $fs_data['parent'] . '/' . $fs_data['name'],
-            'password' => $fs_query['password'],
+            'path' => trim($fs_data['parent']) . '/' . trim($fs_data['name']),
+            'password' => trim($fs_query['password']),
             'refresh' => $fs_query['refresh'],
             'query_method_is' => 'get',
         ];
@@ -586,7 +614,8 @@ function aya_alist_template_search_result($fs_data, $fs_query)
     $html .= '</tbody>';
     $html .= '</table>';
 
+    //分页
+    $html .= aya_alist_format_page_item($fs_query['page'], $fs_query['per_page'], $fs_data['total']);
 
-    $html .= '';
     return $html;
 }

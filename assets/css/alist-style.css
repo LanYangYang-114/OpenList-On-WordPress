@@ -3,6 +3,7 @@
   margin: 2rem auto;
   /* 卡片样式 */
   /* 列表样式 */
+  /* 分页 */
   /* 通用样式 */
 }
 @media (max-width: 480px) {
@@ -126,6 +127,53 @@
 .alist-container .table tr:nth-child(even) {
   background: color-mix(in srgb, var(--alist-cli-card-background) 98%, black);
 }
+.alist-container .pagination {
+  margin: 1rem 0;
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+.alist-container .pagination ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+}
+.alist-container .pagination li {
+  display: inline-block;
+}
+.alist-container .pagination .page-btn,
+.alist-container .pagination .page-btn-disabled {
+  display: block;
+  padding: 0.4rem 0.8rem;
+  background: var(--alist-cli-card-background);
+  border: 1px solid #eee;
+  border-radius: var(--alist-cli-card-border-radius);
+  transition: all 0.2s ease;
+  font-size: 1rem;
+  text-decoration: none;
+}
+.alist-container .pagination .page-btn {
+  background: var(--alist-cli-card-background);
+  color: #333;
+}
+.alist-container .pagination .page-btn-disabled {
+  background: var(--alist-cli-main-color-hover);
+  pointer-events: none;
+  color: #fff;
+}
+.alist-container .pagination .page-btn:hover {
+  background: var(--alist-cli-main-color-hover);
+  color: #fff;
+}
+.alist-container .pagination .total-disc {
+  white-space: nowrap;
+  margin-left: 2rem;
+  font-size: 0.9em;
+}
 .alist-container .icon-mr-s {
   margin-right: 0.2rem;
 }
@@ -151,7 +199,7 @@
   border-radius: var(--alist-cli-card-border-radius);
   display: inline-block;
   text-align: center;
-  transition: background 0.2s;
+  transition: all 0.5s ease;
 }
 .alist-container .down-btn-disabled {
   background: var(--alist-cli-main-color-hover);
@@ -160,12 +208,17 @@
 .alist-container .down-btn:hover {
   background: var(--alist-cli-main-color-hover);
 }
+.alist-container .readme {
+  position: relative;
+  font-size: 0.9rem;
+  margin: 1rem 0;
+}
 .alist-container .disc {
   position: relative;
   font-size: 0.9rem;
   margin: 1rem 0 0 0;
-  display: flex;
-  justify-content: center;
+  white-space: wrap;
+  line-height: 1.6;
 }
 .alist-container .alert .msg {
   font-size: 1rem;

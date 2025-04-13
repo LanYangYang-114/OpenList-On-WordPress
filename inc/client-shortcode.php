@@ -53,14 +53,14 @@ function aya_alist_cli_shortcode_fs_methods($atts = array(), $content = null)
 {
     $atts = shortcode_atts(
         array(
-            'method' => '',
+            'method' => 'list',
             'path' => '/',
             'password' => '',
             //'page' => 1,
             'per_page' => 0,
             //'force_root' => false,
             'parent' => '',
-            'keyword' => '',
+            'keywords' => '',
             'scope' => 2, //0:all 1:dir 2:file
             'refresh' => false,
         ),
@@ -104,19 +104,20 @@ function aya_alist_cli_shortcode_fs_methods($atts = array(), $content = null)
     } else if ($method == 'search') {
         //加载为搜索列表
         $parent = trim($atts['parent']);
-        $keyword = do_shortcode(trim($atts['keyword']));
+        $keywords = trim($atts['keywords']);
         $scope = intval($atts['scope']);
 
         //如果没有配置根目录参数但配置了路径，则切换
-        if ($parent == '' && $path != '') {
+        if ($parent == '' && $path != '/') {
             $parent = $path;
         }
-
-        $per_page_num = 20;
-        $page = 1;
+        //如果分页值为0,则强制重新分页
+        if ($per_page_num == 0) {
+            $per_page_num = 10;
+        }
 
         $fs_query['parent'] = $parent;
-        $fs_query['keyword'] = $keyword;
+        $fs_query['keywords'] = $keywords;
         $fs_query['scope'] = $scope;
     } else {
         $method = 'null';

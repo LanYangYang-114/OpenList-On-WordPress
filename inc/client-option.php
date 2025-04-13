@@ -53,15 +53,15 @@ function aya_alist_server_option_page()
                 ],
                 [
                     'type' => 'content',
-                    'desc' => '文件/目录详情：[code][alist_cli method="get" path="/readme.md" password="" refresh="false"][/alist_cli][/code]',
+                    'desc' => '文件/目录详情：[code][alist_cli method="get" path="/readme.md" password="" refresh="false" /][/code]',
                 ],
                 [
                     'type' => 'content',
-                    'desc' => '列出文件目录：[code][alist_cli method="list" path="/" password="" refresh="false"][/alist_cli][/code]',
+                    'desc' => '列出文件目录：[code][alist_cli method="list" path="/" password="" refresh="false" /][/code]',
                 ],
                 [
                     'type' => 'content',
-                    'desc' => '搜索文件或文件夹：[code][alist_cli method="search" parent="/" keyword="关键词" scope="2" password=""][/alist_cli][/code]',
+                    'desc' => '搜索文件或文件夹：[code][alist_cli method="search" parent="/" keywords="关键词" scope="2" password="" /][/code]',
                 ],
                 [
                     'type' => 'content',
@@ -96,7 +96,7 @@ function aya_alist_server_option_page()
                 [
                     'title' => '令牌缓存时间',
                     'desc' => 'Alist 的 JWt Token 缓存时间（小时），设置为 [code]0[/code] 则每次都重新请求令牌
-                    [br/] * 取决于 Alist 的config.json配置，默认为 48 小时',
+                    [br/] * 取决于 Alist 的 config.json 配置，默认为 48 小时',
                     'id' => 'alist_client_token_expire_hours',
                     'type' => 'text',
                     'default' => '48',
@@ -118,7 +118,7 @@ function aya_alist_server_option_page()
                     [br/]* 此选项可被短代码中的 [code]per_page=""[/code] 参数覆盖',
                     'id' => 'alist_client_per_page_num',
                     'type' => 'text',
-                    'default' => '0',
+                    'default' => '10',
                 ],
                 [
                     'title' => '文件图标切换',
@@ -133,7 +133,7 @@ function aya_alist_server_option_page()
                         'earmark' => '折页',
                         'earmark_fill' => '折页（填充）',
                     ],
-                    'default' => 'file',
+                    'default' => 'earmark',
                 ],
                 [
                     'title' => '链接设置',
@@ -225,14 +225,14 @@ function aya_alist_server_option_page()
                     'id' => 'content',
                     'type' => 'textarea',
                     'label' => '描述',
-                    'desc' => '在页面中显示的描述文本（支持短代码嵌套）',
+                    'desc' => '在页面中显示的描述文本',
                     'default' => '',
                 ],
                 [
                     'id' => 'refresh',
                     'type' => 'checkbox',
                     'label' => '强制刷新',
-                    'desc' => '是否强制刷新（跳过SQL缓存）',
+                    'desc' => '是否强制刷新（跳过缓存）',
                     'default' => false,
                 ],
             )
@@ -261,10 +261,10 @@ function aya_alist_server_option_page()
                     'default' => '/',
                 ],
                 [
-                    'id' => 'keyword',
+                    'id' => 'keywords',
                     'type' => 'text',
                     'label' => '关键词',
-                    'desc' => '搜索的关键词（支持短代码嵌套）',
+                    'desc' => '搜索的关键词',
                     'default' => '',
                 ],
                 [
@@ -283,8 +283,15 @@ function aya_alist_server_option_page()
                     'id' => 'content',
                     'type' => 'textarea',
                     'label' => '描述',
-                    'desc' => '在页面中显示的描述文本（支持短代码嵌套）',
+                    'desc' => '在页面中显示的描述文本',
                     'default' => '',
+                ],
+                [
+                    'id' => 'refresh',
+                    'type' => 'checkbox',
+                    'label' => '强制刷新',
+                    'desc' => '是否强制刷新（跳过缓存）',
+                    'default' => false,
                 ],
             )
         ));
