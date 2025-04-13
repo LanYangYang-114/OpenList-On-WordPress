@@ -208,9 +208,8 @@ function aya_alist_format_file_link($fs_data, $fs_query)
     if ($method == 'get') {
         $full_path = $fs_query['path'];
     } else {
-        $full_path = '/' . ltrim($fs_query['parent'], '/') . urlencode($fs_data['name']);
+        $full_path = '/' . trim($fs_query['path'], '/') . '/' . rawurlencode($fs_data['name']);
     }
-
     //匹配按钮名称
     if ($data_is_dir) {
         $btn_name = aya_alist_format_get_icon('folder') . __('打开', 'AIYA-ALIST');
@@ -243,7 +242,7 @@ function aya_alist_format_file_link($fs_data, $fs_query)
         }
     } else {
         $server_url = aya_alist_server_url();
-        $file_sign = ($fs_data['sign'] != '') ? '' : '?sign=' . $fs_data['sign'];
+        $file_sign = ($fs_data['sign'] == '') ? '' : '?sign=' . $fs_data['sign'];
 
         $btn_href = $server_url . $down_path . $full_path . $file_sign;
     }
