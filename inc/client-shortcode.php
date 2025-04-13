@@ -91,15 +91,15 @@ function aya_alist_cli_shortcode_fs_methods($atts = array(), $content = null)
         $fs_query['path'] = $path;
         $fs_query['refresh'] = $refresh;
 
+        //检查路径是文件则切换为get方法
+        if (!aya_alist_guess_is_file($path)) {
+            $method = 'list';
+        }
+
     } else if ($method == 'list') {
         //加载为文件列表
         $fs_query['path'] = $path;
         $fs_query['refresh'] = $refresh;
-
-        //检查路径是文件则切换为get方法
-        if (aya_alist_guess_is_file($path)) {
-            $method = 'get';
-        }
 
     } else if ($method == 'search') {
         //加载为搜索列表
