@@ -1,11 +1,11 @@
 <?php
 
 define('ALIST_SERVER', 'http://127.0.0.1:5244'); // Alist 服务器地址
-define('ALIST_USERNAME', 'guest'); // Alist 用户名
+define('ALIST_USERNAME', 'admin'); // Alist 用户名
 define('ALIST_PASSWORD', '123456'); // Alist 密码
 
-require_once (__DIR__) . '../Http_Request.php';
-require_once (__DIR__) . '../Alist_API.php';
+require_once (__DIR__) . '/Http_Request.php';
+require_once (__DIR__) . '/Alist_API.php';
 
 //使用文件缓存Token
 function aya_alist_token_cache()
@@ -18,7 +18,7 @@ function aya_alist_token_cache()
     //获取
     $alist = new Alist_API(ALIST_SERVER, false);
 
-    $token_content = $alist->get_token(ALIST_USERNAME, ALIST_PASSWORD);
+    $token_content = $alist->get_token_hash(ALIST_USERNAME, ALIST_PASSWORD);
 
     file_put_contents($cache_token, $token_content);
     return $token_content;
@@ -30,7 +30,7 @@ function aya_alist_user_info_me()
 
     $alist = new Alist_API(ALIST_SERVER, $TOKEN);
 
-    return $alist->get_info_me();
+    return $alist->get_me();
 }
 //获取文件列表
 function aya_alist_file_list($path = '/')
@@ -55,7 +55,7 @@ function aya_alist_file_mkdir($path)
 {
     $TOKEN = aya_alist_token_cache();
 
-    $alist = new Alist_UpFile(ALIST_SERVER, $TOKEN);
+    $alist = new Alist_API(ALIST_SERVER, $TOKEN);
 
     return $alist->fs_mkdir($path);
 }
