@@ -1,5 +1,7 @@
 ## Alist 文件列表客户端插件 for WordPress
 
+> **风险提示：** 此插件的上游项目 alist 被曝供应链投毒，请自行考量是否弃用。 [Source from](https://www.nodeseek.com/post-361011-1)
+
 ![截图](https://github.com/yeraph-plus/alist-client-plugin-for-wordpress/blob/master/screenshot/2025-04-13%20081411.png?raw=true)
 
 使用 WordPress 短代码功能在文章中插入 Alist 服务器中的文件链接，通过 Alist 托管站点的文件下载。
